@@ -27,18 +27,22 @@ class VMM:
     def generate(self):
         # initialize physical machines
         for i in xrange(self.physical_size):
-            self.physical_machines.add(PM(rng.rand_int(1, MAX_CAPACITY)))
+            self.physical_machines.add(PM(rng.randint(1, MAX_CAPACITY)))
         for pm in self.physical_machines:
-            pm.neighbors = set(rng.sample(self.physical_machines, rng.randint(1, physical_size)))
-            pm.neighbors.remove(pm)
+            pm.neighbors = set(rng.sample(self.physical_machines, rng.randint(1, self.physical_size)))
+            pm.neighbors.discard(pm)
             for neighbor in pm.neighbors:
-                self.distances[(pm, neighbor))] = rng.randint(1, MAX_DISTANCE)
+                if not (self.distances.has_key((pm, neighbor)) or self.distances.has_key((neighbor, pm))):
+                    self.distances[(pm, neighbor)] = rng.randint(1, MAX_DISTANCE)
+                    self.distances[(neighbor, pm)] = self.distances[(pm, neighbor)]
 
         # initialize virtual machines
         for i in xrange(self.virtual_size):
-            self.virtual_machines.add(PM(rng.randint(1, MAX_LOAD)))
+            self.virtual_machines.add(VM(rng.randint(1, MAX_LOAD)))
         for vm in self.virtual_machines:
-            vm.neighbors = set(rng.sample(self.virtual_machines, rng.randint(1, virtual_size)))
-            vm.neighbors.remove(vm)
+            vm.neighbors = set(rng.sample(self.virtual_machines, rng.randint(1, self.virtual_size)))
+            vm.neighbors.discard(vm)
             for neighbor in vm.neighbors:
-                self.distances[(vm, neighbor))] = rng.randint(1, MAX_TRAFFIC)
+                if not (self.traffic_demands.has_key((vm, neighbor)) or self.traffic_demands.has_key((neighbor, vm))):
+                    self.traffic_demands[(vm, neighbor)] = rng.randint(1, MAX_TRAFFIC)
+                    self.traffic_demands[(neighbor, vm)] = self.traffic_demands[(vm, neighbor)]
