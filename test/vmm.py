@@ -22,7 +22,7 @@ class VMM:
         self.physical_machines = set()
         self.virtual_machines = set()
         self.distances = {}
-        self.traffic_demands = {}
+        self.traffic = {}
 
     def generate(self):
         # initialize physical machines
@@ -43,6 +43,6 @@ class VMM:
             vm.neighbors = set(rng.sample(self.virtual_machines, rng.randint(1, self.virtual_size)))
             vm.neighbors.discard(vm)
             for neighbor in vm.neighbors:
-                if not (self.traffic_demands.has_key((vm, neighbor)) or self.traffic_demands.has_key((neighbor, vm))):
-                    self.traffic_demands[(vm, neighbor)] = rng.randint(1, MAX_TRAFFIC)
-                    self.traffic_demands[(neighbor, vm)] = self.traffic_demands[(vm, neighbor)]
+                if not (self.traffic.has_key((vm, neighbor)) or self.traffic.has_key((neighbor, vm))):
+                    self.traffic[(vm, neighbor)] = rng.randint(1, MAX_TRAFFIC)
+                    self.traffic[(neighbor, vm)] = self.traffic[(vm, neighbor)]
