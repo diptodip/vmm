@@ -1,22 +1,23 @@
 import random as rng
+import numpy as np
 
 MAX_CAPACITY = 5000
 MAX_DISTANCE = 100
 MAX_LOAD = 1000
 MAX_TRAFFIC = 500
 
-class PM:
+class PM(object):
     def __init__(self, capacity):
         self.capacity = capacity
         self.neighbors = set()
 
-class VM:
+class VM(object):
     def __init__(self, load):
         self.load = load
         self.neighbors = set()
 
-class VMM:
-    def __init__(self, physical_size = 10, virtual_size = 20):
+class VMM(object):
+    def __init__(self, physical_size = 3, virtual_size = 4):
         self.physical_size = physical_size
         self.virtual_size = virtual_size
         self.physical_machines = set()
