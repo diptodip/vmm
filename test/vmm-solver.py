@@ -37,10 +37,18 @@ def calc_cost(x, vmm):
             return -2
 
 def brute_force(vmm):
+    print("[info] enumerating space")
     space = [dict(zip(vmm.virtual_machines, x)) for x in itertools.product(vmm.physical_machines, repeat=vmm.virtual_size)]
+    print("[out] space enumerated")
+    print("[info] calculating costs")
+    costs = [calc_cost(x, vmm) for x in space]
+    x, index = min((x, index) for (index, x) in enumerate(costs) if x >= 0)
     print(space)
-    for x in space:
-        print(calc_cost(x, vmm))
+    for cost in costs:
+        print("[out] {}".format(cost))
+    print("[out] solution: {}".format(space[index]))
+    print("[out] cost: {}".format(x))
+    print("[out] done")
 
 
 a = VMM(5, 6)
