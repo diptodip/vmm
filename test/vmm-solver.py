@@ -1,6 +1,8 @@
 #import cvxopt
 from vmm import *
 import itertools
+import multiprocessing as mp
+import time
 
 def check_capacities(x, vmm):
     capacities = dict()
@@ -36,21 +38,42 @@ def calc_cost(x, vmm):
         else:
             return -2
 
+def generate_mapping(part, pms, vms, space, reps):
+    space += [dict(zip(vms, x)) for x in itertools.product(part, pms, repeat=reps)]
+
 def brute_force(vmm):
     print("[info] enumerating space")
     space = [dict(zip(vmm.virtual_machines, x)) for x in itertools.product(vmm.physical_machines, repeat=vmm.virtual_size)]
+    #space = []
+    #results = []
+    #pool = mp.Pool(processes=vmm.physical_size)
+    #pms = list(vmm.physical_machines)
+    #reps = vmm.physical_size - 1
+    #print("[out] space enumerated")
+    #print("[info] calculating costs")
+    #for i in xrange(vmm.physical_size):
+    #    part = 0
+    #    if i == reps:
+    #        part = pms[i:]
+    #    else:
+    #        part = pms[i:i+1]
+    #    results.append(pool.apply_async(generate_mapping(part, pms, vmm.virtual_machines, space, reps)))
     print("[out] space enumerated")
-    print("[info] calculating costs")
-    costs = [calc_cost(x, vmm) for x in space]
-    x, index = min((x, index) for (index, x) in enumerate(costs) if x >= 0)
-    print(space)
-    for cost in costs:
-        print("[out] {}".format(cost))
-    print("[out] solution: {}".format(space[index]))
-    print("[out] cost: {}".format(x))
-    print("[out] done")
+    #costs = [calc_cost(x, vmm) for x in space]
+    #x, index = min((x, index) for (index, x) in enumerate(costs) if x >= 0)
+    #print(space)
+    #for cost in costs:
+        #print("[out] {}".format(cost))
+    #print("[out] solution: {}".format(space[index]))
+    #print("[out] cost: {}".format(x))
+    #print("[out] done")
 
+def main():
+    start_time = time.time()
+    a = VMM(8, 8)
+    a.generate()
+    brute_force(a)
+    print("-----%s seconds-----" % (time.time() - start_time))
 
-a = VMM(5, 6)
-a.generate()
-brute_force(a)
+if __name__ == '__main__': main()
+
