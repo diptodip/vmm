@@ -77,9 +77,9 @@ def integer_program(vmm):
             varname = "a_" + str(i) + "_" + str(j) + "-" + str(k) + "_" + str(l)
             allvars.append(varname)
             assignments[i, j, k, l] = varname
-            distance = 1
-            demand = 1
-            if vmm.distances.has_key((i, k)) and vmm.traffic.has_key((j, l)):
+            distance = 0
+            demand = 0
+            if vmm.distances.has_key((pms[i], pms[k])) and vmm.traffic.has_key((vms[j], vms[l])):
                 distance = vmm.distances[(i, k)]
                 demand = vmm.traffic[(j, l)]
             allcosts.append(distance * demand)
