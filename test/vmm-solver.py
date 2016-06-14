@@ -117,7 +117,7 @@ def integer_program(vmm):
     print(sol.status[sol.get_status()])
     
     if sol.is_primal_feasible():
-        print("[out] ILP cost = ", sol.get_objective_value())
+        print("[out] ILP cost = {}".format(sol.get_objective_value()))
     else:
         print("[out] ILP infeasible")
     print("[out] ILP done")
