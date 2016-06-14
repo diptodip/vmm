@@ -77,8 +77,8 @@ def integer_program(vmm):
             varname = "a_" + str(i) + "_" + str(j) + "-" + str(k) + "_" + str(l)
             allvars.append(varname)
             assignments[i, j, k, l] = varname
-            distance = 1
-            demand = 1
+            distance = 0
+            demand = 0
             if vmm.distances.has_key((pms[i], pms[k])) and vmm.traffic.has_key((vms[j], vms[l])):
                 distance = vmm.distances[(pms[i], pms[k])]
                 demand = vmm.traffic[(vms[j], vms[l])]
@@ -92,7 +92,7 @@ def integer_program(vmm):
         variables = []
         for i, k in itertools.product(range(vmm.physical_size), repeat=2):
             variables.append(assignments[i, j, k, l])
-        c.linear_constraints.add(lin_expr=[cplex.SparsePair(variables, [1] * len(variables))], senses=["E"], rhs=[2])
+        c.linear_constraints.add(lin_expr=[cplex.SparsePair(variables, [1] * len(variables))], senses=["E"], rhs=[1])
 
     # VM assignments cannot violate PM capacities
     coefficients = []
