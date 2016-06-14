@@ -106,7 +106,7 @@ def integer_program(vmm):
             coefficients.append(load_j + load_l)
             righthand.append(capacity_i + capacity_k)
     
-    c.linear_constraints.add(lin_expr=[cplex.SparsePair([v], [c]) for v in allvars and c in coefficients], senses=["L"] * len(allvars), rhs=righthand)
+    c.linear_constraints.add(lin_expr=[cplex.SparsePair([allvars[x]], [coefficients[x]]) for x in range(len(allvars))], senses=["L"] * len(allvars), rhs=righthand)
 
     # solve the ILP
     c.solve()
