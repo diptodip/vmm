@@ -80,8 +80,8 @@ def integer_program(vmm):
             distance = 0
             demand = 0
             if vmm.distances.has_key((pms[i], pms[k])) and vmm.traffic.has_key((vms[j], vms[l])):
-                distance = vmm.distances[(i, k)]
-                demand = vmm.traffic[(j, l)]
+                distance = vmm.distances[(pms[i], pms[k])]
+                demand = vmm.traffic[(vms[j], vms[l])]
             allcosts.append(distance * demand)
             #costs[i, j, k, l] = distance * demand
 
