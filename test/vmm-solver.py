@@ -22,7 +22,7 @@ def calc_cost(x, vmm):
         return -1
     else:
         cost = 0
-        for pair in itertools.combinations(vmm.virtual_machines, 2):
+        for pair in itertools.product(vmm.virtual_machines, 2):
             pm1 = x[pair[0]]
             pm2 = x[pair[1]]
             distance = -1
