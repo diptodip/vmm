@@ -102,7 +102,7 @@ def warehouse():
     c = cplex.Cplex()
 
     # Set an overall node limit
-    c.parameters.mip.limits.nodes.set(5000)
+    c.parameters.mip.limits.nodes.set(10000)
 
     setupproblem(c)
 
