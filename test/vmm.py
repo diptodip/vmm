@@ -36,6 +36,7 @@ class VMM(object):
                 if not (self.distances.has_key((pm, neighbor)) or self.distances.has_key((neighbor, pm))):
                     self.distances[(pm, neighbor)] = rng.randint(1, MAX_DISTANCE)
                     self.distances[(neighbor, pm)] = self.distances[(pm, neighbor)]
+            self.distances[(pm, pm)] = 0
 
         # initialize virtual machines
         for i in xrange(self.virtual_size):
@@ -47,3 +48,4 @@ class VMM(object):
                 if not (self.traffic.has_key((vm, neighbor)) or self.traffic.has_key((neighbor, vm))):
                     self.traffic[(vm, neighbor)] = rng.randint(1, MAX_TRAFFIC)
                     self.traffic[(neighbor, vm)] = self.traffic[(vm, neighbor)]
+            self.traffic[(vm, vm)] = 0
