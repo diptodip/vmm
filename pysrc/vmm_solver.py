@@ -40,12 +40,13 @@ def calc_cost(x, vmm):
             return -2
 
 def write_solution(filename, x, cost):
-    sol = [0] * len(x)
+    sol = [[0] for i in range(len(x))]
+    print(len(x))
     for vm in x:
-        vm_index = vm.name
-        pm_index = x[vm].name
+        vm_index = vm.number
+        pm_index = x[vm].number
         sol[vm_index] = pm_index
-    with open(filename, w) as f:
+    with open(filename, 'w') as f:
         f.write(str(cost) + "\n")
         for s in sol:
             f.write(str(s) + "\n")
@@ -62,6 +63,7 @@ def brute_force(vmm):
     print("[out] brute force solution: \n{0}".format(space[index]))
     print("[out] brute force cost: {}".format(x))
     print("[out] brute force done")
+    return space[index]
 
 def quadratic_integer_program(vmm):
     P = list(vmm.physical_machines)
@@ -152,6 +154,7 @@ def quadratic_integer_program(vmm):
     # using CPLEX cost
     print("[out] IQP CPLEX cost: {}".format(sol.get_objective_value()))
     print("[out] IQP done")
+    return x
 
 def integer_program(vmm):
     vms = list(vmm.virtual_machines)
@@ -262,6 +265,7 @@ def integer_program(vmm):
     # using CPLEX cost
     print("[out] ILP CPLEX cost: {}".format(sol.get_objective_value()))
     print("[out] ILP done")
+    return x
 
 def main():
     a = VMM(4, 6)

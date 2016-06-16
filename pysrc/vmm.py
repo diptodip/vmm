@@ -44,7 +44,7 @@ class VMM(object):
     def generate(self):
         # initialize physical machines
         for i in xrange(self.physical_size):
-            pm = PM(i+1, rng.randint(1, MAX_CAPACITY))
+            pm = PM(i, rng.randint(1, MAX_CAPACITY))
             self.pm_list.append(pm)
             self.physical_machines.add(pm)
         for pm in self.physical_machines:
@@ -58,7 +58,7 @@ class VMM(object):
 
         # initialize virtual machines
         for i in xrange(self.virtual_size):
-            vm = VM(i+1, rng.randint(1, MAX_LOAD))
+            vm = VM(i, rng.randint(1, MAX_LOAD))
             self.vm_list.append(vm)
             self.virtual_machines.add(vm)
         for vm in self.virtual_machines:
@@ -74,12 +74,12 @@ class VMM(object):
         with open(filename) as f:
             self.physical_size = int(f.readline())
             for i in range(self.physical_size):
-                pm = PM(i+1, int(f.readline()))
+                pm = PM(i, int(f.readline()))
                 self.pm_list.append(pm)
                 self.physical_machines.add(pm)
             self.virtual_size = int(f.readline())
             for i in range(self.virtual_size):
-                vm = VM(i+1, int(f.readline()))
+                vm = VM(i, int(f.readline()))
                 self.vm_list.append(vm)
                 self.virtual_machines.add(vm)
             for i in range(self.physical_size):
