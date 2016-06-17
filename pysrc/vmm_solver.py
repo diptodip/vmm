@@ -1,5 +1,5 @@
 #import cvxopt
-import cplex
+#import cplex
 from vmm import *
 import itertools
 import numpy as np
@@ -22,7 +22,7 @@ def calc_cost(x, vmm):
         return -1
     else:
         cost = 0
-        for vm1, vm2 in itertools.product(vmm.virtual_machines, repeat=2):
+        for vm1, vm2 in itertools.combinations(vmm.virtual_machines, 2):
             pm1 = x[vm1]
             pm2 = x[vm2]
             distance = -1
@@ -32,12 +32,8 @@ def calc_cost(x, vmm):
             if vmm.traffic.has_key((vm1, vm2)):
                 traffic = vmm.traffic[(vm1, vm2)]
             if not distance == -1 and not traffic == -1:
-                cost += (traffic * distance)
-                updated += 1
-        if updated > 0:
-            return cost
-        else:
-            return -2
+                cost += traffic * distance
+        return cost
 
 def write_solution(filename, x, cost):
     sol = [[0] for i in range(len(x))]
@@ -58,7 +54,7 @@ def brute_force(vmm):
     costs = [calc_cost(x, vmm) for x in space]
     x, index = min((x, index) for (index, x) in enumerate(costs) if x >= 0)
     #print(space)
-    #for cost in positive_costs:
+    #for cost in costs:
         #print("{}".format(cost))
     print("[out] brute force solution: \n{0}".format(space[index]))
     print("[out] brute force cost: {}".format(x))
@@ -266,6 +262,10 @@ def integer_program(vmm):
     print("[out] ILP CPLEX cost: {}".format(sol.get_objective_value()))
     print("[out] ILP done")
     return x
+
+def random_iteration(vmm, k):
+    for i in range(k):
+        print()
 
 def main():
     a = VMM(4, 6)
