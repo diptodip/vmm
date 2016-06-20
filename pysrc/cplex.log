@@ -1,0 +1,5 @@
+
+Log started (V12.6.3.0) Mon Jun 20 18:47:40 2016
+
+CPLEX Error  1435: Line 5: Exponent '1e+40' out of range.
+No file read.

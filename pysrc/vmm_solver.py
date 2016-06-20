@@ -91,8 +91,8 @@ def quadratic_integer_program(vmm):
         for i, j in itertools.product(range(vmm.virtual_size), repeat=2):
             # these are d_u_v and w_i_j from the VMM problem definition
             # (distance and traffic demand, respectively)
-            d = cplex.infinity
-            w = cplex.infinity
+            d = 0
+            w = 0
             if vmm.distances.has_key((P[u], P[v])):
                 d = vmm.distances[(P[u], P[v])]
             if vmm.traffic.has_key((V[i], V[j])):
@@ -180,8 +180,8 @@ def integer_program(vmm):
             varname = "a_" + str(i) + "_" + str(j) + "-" + str(k) + "_" + str(l)
             allvars.append(varname)
             pairs[i, j, k, l] = varname
-            distance = cplex.infinity
-            demand = cplex.infinity
+            distance = 0
+            demand = 0
             if vmm.distances.has_key((pms[i], pms[k])) and vmm.traffic.has_key((vms[j], vms[l])):
                 distance = vmm.distances[(pms[i], pms[k])]
                 demand = vmm.traffic[(vms[j], vms[l])]
