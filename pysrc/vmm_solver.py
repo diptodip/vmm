@@ -5,6 +5,7 @@ import itertools
 import numpy as np
 import time
 import random as rng
+import math
 
 def check_capacities(x, vmm):
     capacities = dict()
@@ -47,6 +48,9 @@ def write_solution(filename, x, cost):
         f.write(str(cost) + "\n")
         for s in sol:
             f.write(str(s) + "\n")
+
+def write_cplex(c, filename):
+    c.write(filename)
 
 def brute_force(vmm):
     print("[info] enumerating space")
@@ -117,6 +121,7 @@ def quadratic_integer_program(vmm):
 
     # solve the IQP
     c.solve()
+    write_cplex(c, "a_quadratic.lp")
     sol = c.solution
 
     # check solution feasibility
@@ -228,6 +233,7 @@ def integer_program(vmm):
 
     # solve the ILP
     c.solve()
+    write_cplex(c, "a_linear.lp")
     sol = c.solution
 
     # check solution feasibility
@@ -264,7 +270,7 @@ def integer_program(vmm):
     print("[out] ILP done")
     return x
 
-def generate_mapping(vmm):
+def random_mapping(vmm):
     x = {}
     for vm in vmm.vm_list:
         x[vm] = rng.choice(vmm.pm_list)
@@ -274,7 +280,7 @@ def random_iteration(vmm, k):
     cost = cplex.infinity
     x = {}
     for i in range(k):
-        current = generate_mapping(vmm)
+        current = random_mapping(vmm)
         current_cost = calc_cost(current, vmm)
         if current_cost >= 0 and current_cost < cost:
             cost = current_cost
@@ -282,6 +288,36 @@ def random_iteration(vmm, k):
     print("[out] RI solution: \n{}".format(x))
     print("[out] RI cost: {}".format(cost))
     print("[out] RI done")
+    return x
+
+def likelihood(current_cost, new_cost, T):
+    if new_cost > 0 and new_cost < current_cost:
+        return 1
+    else:
+        return math.exp((current_cost - new_cost)/T)
+
+def simulated_annealing(vmm, T, decay):
+    cost = cplex.infinity
+    vms = vmm.vm_list
+    x = random_mapping(vmm)
+    current = x
+    current_cost = calc_cost(current, vmm)
+    while T > 1:
+        vm1, vm2 = rng.sample(vms, 2)
+        new = current
+        new[vm1] = current[vm2]
+        new[vm2] = current[vm1]
+        new_cost = calc_cost(new, vmm)
+        if likelihood(current_cost, new_cost, T) > rng.random():
+            current = new
+            current_cost = new_cost
+        if current_cost > 0 and current_cost < cost:
+            cost = current_cost
+            x = current
+        T *= 1 - decay
+    print("[out] SA solution: \n{}".format(x))
+    print("[out] SA cost: {}".format(cost))
+    print("[out] SA done")
     return x
 
 def main():
@@ -297,7 +333,7 @@ def main():
     print("-----%s seconds-----" % (time.time() - ilp_time))
 
     ri_time = time.time()
-    random_iteration(a, 5000)
+    simulated_annealing(a, 1000, 0.003)
     print("-----%s seconds-----" % (time.time() - ri_time))
 
 
