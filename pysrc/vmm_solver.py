@@ -279,13 +279,13 @@ def random_iteration(vmm, k):
         if current_cost >= 0 and current_cost < cost:
             cost = current_cost
             x = current
-    print("[out] RI solution: {}".format(x))
+    print("[out] RI solution: \n{}".format(x))
     print("[out] RI cost: {}".format(cost))
     print("[out] RI done")
     return x
 
 def main():
-    a = VMM(4, 6)
+    a = VMM(4, 7)
     a.generate()
 
     bf_time = time.time()
