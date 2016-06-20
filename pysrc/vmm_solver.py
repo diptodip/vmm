@@ -1,10 +1,10 @@
 #import cvxopt
-#import cplex
+import cplex
 from vmm import *
 import itertools
 import numpy as np
 import time
-import rand as rng
+import random as rng
 
 def check_capacities(x, vmm):
     capacities = dict()
@@ -275,7 +275,7 @@ def random_iteration(vmm, k):
     x = {}
     for i in range(k):
         current = generate_mapping(vmm)
-        current_cost = calc_cost(current)
+        current_cost = calc_cost(current, vmm)
         if current_cost >= 0 and current_cost < cost:
             cost = current_cost
             x = current
