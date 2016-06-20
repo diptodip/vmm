@@ -23,10 +23,10 @@ class VM(object):
         self.number = number
         self.load = load
         self.neighbors = set()
-        
+
     def __str__(self):
         return "VM {}".format(self.number)
-    
+
     def __repr__(self):
         return "VM {}".format(self.number)
 

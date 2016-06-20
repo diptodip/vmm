@@ -4,6 +4,7 @@ from vmm import *
 import itertools
 import numpy as np
 import time
+import rand as rng
 
 def check_capacities(x, vmm):
     capacities = dict()
@@ -68,10 +69,10 @@ def quadratic_integer_program(vmm):
     c = cplex.Cplex()
     c.objective.set_sense(c.objective.sense.minimize)
     c.parameters.mip.limits.nodes.set(100000)
-    
+
     allvars = []
     assignments = np.ndarray(shape=(vmm.physical_size, vmm.virtual_size), dtype=object)
-    
+
     # assign variables: a_u_i = 1 if VM i is assigned to PM u, else 0
     for u in range(vmm.physical_size):
         for i in range(vmm.virtual_size):
@@ -80,7 +81,7 @@ def quadratic_integer_program(vmm):
             assignments[u, i] = varname
 
     c.variables.add(names = allvars, lb=[0] * len(allvars), ub = [1] * len(allvars), types=["B"] * len(allvars))
-    
+
     # set quadratic objective function: min{sum(w_j_l * d_i_k * a_u_i * a_k_l)}
     for u, v in itertools.product(range(vmm.physical_size), repeat=2):
         for i, j in itertools.product(range(vmm.virtual_size), repeat=2):
@@ -138,7 +139,7 @@ def quadratic_integer_program(vmm):
             if s == 1:
                 x[V[j]] = P[i]
     print(x)
-    
+
     cost = calc_cost(x, vmm)
 
     # print results
@@ -199,7 +200,7 @@ def integer_program(vmm):
             t = costs[i, j, k, l]
             c.objective.set_linear(pairs[i, j, k, l], t)
 
-    
+
     # each VM is assigned to exactly one PM
     for j in range(vmm.virtual_size):
         variables = []
@@ -224,7 +225,7 @@ def integer_program(vmm):
             variables.append(assignments[u, i])
             coefficients.append(vms[i].load)
         c.linear_constraints.add(lin_expr=[cplex.SparsePair(variables, coefficients)], senses=["L"], rhs=[righthand])
-    
+
     # solve the ILP
     c.solve()
     sol = c.solution
@@ -249,7 +250,7 @@ def integer_program(vmm):
             if s == 1:
                 x[vms[j]] = pms[i]
     print(x)
-    
+
     cost = calc_cost(x, vmm)
 
     # print results
@@ -263,9 +264,25 @@ def integer_program(vmm):
     print("[out] ILP done")
     return x
 
+def generate_mapping(vmm):
+    x = {}
+    for vm in vmm.vm_list:
+        x[vm] = rng.choice(vmm.pm_list)
+    return x
+
 def random_iteration(vmm, k):
+    cost = cplex.infinity
+    x = {}
     for i in range(k):
-        print()
+        current = generate_mapping(vmm)
+        current_cost = calc_cost(current)
+        if current_cost >= 0 and current_cost < cost:
+            cost = current_cost
+            x = current
+    print("[out] RI solution: {}".format(x))
+    print("[out] RI cost: {}".format(cost))
+    print("[out] RI done")
+    return x
 
 def main():
     a = VMM(4, 6)
@@ -274,9 +291,14 @@ def main():
     bf_time = time.time()
     brute_force(a)
     print("-----%s seconds-----" % (time.time() - bf_time))
-    
+
     ilp_time = time.time()
     quadratic_integer_program(a)
     print("-----%s seconds-----" % (time.time() - ilp_time))
+
+    ri_time = time.time()
+    random_iteration(a, 5000)
+    print("-----%s seconds-----" % (time.time() - ri_time))
+
 
 if __name__ == "__main__": main()
