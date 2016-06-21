@@ -121,7 +121,6 @@ def quadratic_integer_program(vmm):
 
     # solve the IQP
     c.solve()
-    write_cplex(c, "a_quadratic.lp")
     sol = c.solution
 
     # check solution feasibility
@@ -233,7 +232,6 @@ def integer_program(vmm):
 
     # solve the ILP
     c.solve()
-    write_cplex(c, "a_linear.lp")
     sol = c.solution
 
     # check solution feasibility
