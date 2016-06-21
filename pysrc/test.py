@@ -3,8 +3,9 @@ from vmm_solver import *
 import cplex
 import time
 
-a = VMM(8, 16)
-a.read("a.vmm")
+a = VMM(10, 20)
+#a.read("a.vmm")
+a.generate()
 x = brute_force(a)
 bf = calc_cost(x, a)
 #write_solution("brute_force_a.vmms", x, bf)
