@@ -14,10 +14,10 @@ ilp_response = []
 ri_response = []
 
 # measuring times for various methods
-for i in range(5):
-    for j in range(10):
+for i in range(4):
+    for j in range(50):
         a = 0
-        if i == 4:
+        if i == 3:
             a = VMM(i+1, 9)
         else:
             a = VMM(i+1, 2*(i+1))
@@ -62,9 +62,9 @@ plt.title("Time to completion for VMM instances")
 plt.xlabel("problem size in number of physical machines")
 plt.ylabel("time (s)")
 bf_plot, = plt.plot(variable, bf_response, 'co', label='BF')
+ri_plot, = plt.plot(variable, ri_response, 'go', label='RI')
 ilp_plot, = plt.plot(variable, ilp_response, 'bo', label='ILP')
 iqp_plot, = plt.plot(variable, iqp_response, 'ro', label='IQP')
-ri_plot, = plt.plot(variable, ri_response, 'go', label='RI')
 plt.legend(handles=[bf_plot, ilp_plot, iqp_plot, ri_plot])
 plt.savefig("june-21-fig1.png", format="png", dpi=300)
 plt.clf()
