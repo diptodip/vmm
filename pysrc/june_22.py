@@ -52,10 +52,11 @@ plt.title("Difference in cost compared to brute force")
 plt.xlabel("true brute force cost")
 plt.ylabel("difference from brute force cost")
 lp_plot, = plt.plot(variable, lp_response, 'co', label='LP')
+ri_plot, = plt.plot(variable, ri_response, 'go', label='RI')
 ilp_plot, = plt.plot(variable, ilp_response, 'bo', label='ILP')
 iqp_plot, = plt.plot(variable, iqp_response, 'ro', label='IQP')
-ri_plot, = plt.plot(variable, ri_response, 'go', label='RI')
-plt.legend(handles=[lp_plot, ilp_plot, iqp_plot, ri_plot])
+
+plt.legend(handles=[lp_plot, ri_plot, ilp_plot, iqp_plot])
 plt.savefig("june-22-fig1.png", format="png", dpi=300)
 plt.clf()
 
