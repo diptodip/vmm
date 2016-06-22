@@ -12,7 +12,7 @@ ilp_response = []
 lp_response = []
 ri_response = []
 
-for i in range(10):
+for i in range(1000):
     a = VMM(3, 6)
     a.generate()
     x = {}
