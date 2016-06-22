@@ -292,7 +292,7 @@ def likelihood(current_cost, new_cost, T):
     if new_cost > 0 and new_cost < current_cost:
         return 1
     else:
-        return math.exp((current_cost - new_cost)/T)
+        return math.exp((current_cost - abs(new_cost))/T)
 
 def simulated_annealing(vmm, T, decay):
     cost = cplex.infinity
@@ -301,10 +301,11 @@ def simulated_annealing(vmm, T, decay):
     current = x
     current_cost = calc_cost(current, vmm)
     while T > 1:
-        vm1, vm2 = rng.sample(vms, 2)
+        vm1, vm2, vm3 = rng.sample(vms, 3)
         new = current
-        new[vm1] = current[vm2]
+        new[vm1] = current[vm3]
         new[vm2] = current[vm1]
+        new[vm3] = current[vm2]
         new_cost = calc_cost(new, vmm)
         if likelihood(current_cost, new_cost, T) > rng.random():
             current = new
@@ -314,7 +315,7 @@ def simulated_annealing(vmm, T, decay):
             x = current
         T *= 1 - decay
     print("[out] SA solution: \n{}".format(x))
-    print("[out] SA cost: {}".format(cost))
+    print("[out] SA cost: {}".format(calc_cost(x, vmm)))
     print("[out] SA done")
     return x
 
@@ -331,7 +332,7 @@ def main():
     print("-----%s seconds-----" % (time.time() - ilp_time))
 
     ri_time = time.time()
-    simulated_annealing(a, 1000, 0.003)
+    simulated_annealing(a, 10000, 0.0003)
     print("-----%s seconds-----" % (time.time() - ri_time))
 
 
