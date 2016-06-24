@@ -12,6 +12,7 @@ def generate_lp_linear(vmm, filename):
     objvars = np.ndarray(shape=(vmm.physical_size, vmm.virtual_size, vmm.physical_size, vmm.virtual_size), dtype=object)
     assignments = np.ndarray(shape=(vmm.physical_size, vmm.virtual_size), dtype=object)
 
+    print("[out] generating objective function")
     counter = 0
     for u, v in itertools.product(range(vmm.physical_size), repeat=2):
         for i, j in itertools.product(range(vmm.virtual_size), repeat=2):
@@ -33,6 +34,8 @@ def generate_lp_linear(vmm, filename):
         for i in range(vmm.virtual_size):
             varname = "a_" + str(u) + "_" + str(i)
             assignments[u, i] = varname
+
+    print("[out] generating constraints")
 
     counter = 0
     for u in range(vmm.physical_size):
@@ -65,6 +68,8 @@ def generate_lp_linear(vmm, filename):
         constraint = "c" + str(counter) + ": " + constraint
         assignment_guarantee += constraint + " = 1\n"
         counter += 1
+
+    print("[out] generating bounds")
     
     for u, v in itertools.product(range(vmm.physical_size), repeat=2):
         for i, j in itertools.product(range(vmm.virtual_size), repeat=2):
@@ -73,6 +78,8 @@ def generate_lp_linear(vmm, filename):
     for u in range(vmm.physical_size):
         for i in range(vmm.virtual_size):
             bounds += "0 <= " + str(assignments[u, i]) + " <= 1\n"
+
+    print("[out] printing .lp file")
 
     with open(filename, 'w') as f:
         f.write("Minimize\n")
