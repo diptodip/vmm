@@ -377,6 +377,7 @@ def linear_program(vmm):
     pairs = np.ndarray(shape=(vmm.physical_size, vmm.virtual_size, vmm.physical_size, vmm.virtual_size), dtype=object)
     assignments = np.ndarray(shape=(vmm.physical_size, vmm.virtual_size), dtype=object)
 
+    print("[out] generating variables")
     # assignment variables: pairs["a_u_i-k_l"] = 1 if VM j assigned to PM i AND VM l assigned to PM k, else 0
     for i, k in itertools.product(range(vmm.physical_size), repeat=2):
         for j, l in itertools.product(range(vmm.virtual_size), repeat=2):
@@ -398,6 +399,10 @@ def linear_program(vmm):
             allvars.append(varname)
             assignments[i, j] = varname
 
+    print("[out] variables generated")
+
+    print("[out] initializing objective and variables")
+
     c.variables.add(names=allvars, lb=[0.0] * len(allvars), ub=[1.0] * len(allvars), types=["C"] * len(allvars))
 
     # set objective function
@@ -408,6 +413,7 @@ def linear_program(vmm):
             t = costs[i, j, k, l]
             c.objective.set_linear(pairs[i, j, k, l], t)
 
+    print("[out] generating constraints")
 
     # each VM is assigned to exactly one PM
     for j in range(vmm.virtual_size):
@@ -434,6 +440,10 @@ def linear_program(vmm):
             coefficients.append(vms[i].load)
         c.linear_constraints.add(lin_expr=[cplex.SparsePair(variables, coefficients)], senses=["L"], rhs=[righthand])
 
+    print("[out] constraints complete")
+    write_cplex(c, "test.lp")
+    print("DONE WRITING")
+    
     # solve the LP
     c.solve()
     sol = c.solution
