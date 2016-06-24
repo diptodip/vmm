@@ -83,3 +83,4 @@ def generate_lp_linear(vmm, filename):
         f.write(variable_matching)
         f.write("Bounds\n")
         f.write(bounds)
+        f.write("End")
