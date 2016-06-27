@@ -1,23 +1,18 @@
 #include<iostream>
 #include<fstream>
 #include<string>
-#include<cstdlib>
 
 int main(int argc, char** argv) {
     // reading .vmm file
     using namespace std;
     cout << "[out] reading .vmm file" << endl;
     ifstream in(argv[0]);
-    if (!in) {
-        cerr << "oops" << endl;
-        exit(1);
-    }
     string strin;
     getline(in, strin);
     int pm_size = stoi(strin);
     int pm_caps[pm_size];
     for (int i = 0; i < pm_size; i++) {
-        getline(in, strin)
+        getline(in, strin);
         pm_caps[i] = stoi(strin);
     }
     getline(in, strin);
@@ -43,7 +38,7 @@ int main(int argc, char** argv) {
     }
     in.close();
 
-    string assignments[][];
+    string assignments[pm_size][vm_size];
     string bounds;
     string variable_matching;
     string assignment_guarantee;
@@ -56,7 +51,7 @@ int main(int argc, char** argv) {
         for (int i = 0; i < vm_size; i++) {
             string varname = "a_" + to_string(u) + "_" + to_string(i);
             assignments[u][i] = varname;
-            bounds += "0 <= " + varname + " <= 1\n"
+            bounds += "0 <= " + varname + " <= 1\n";
         }
     }
     
@@ -73,11 +68,11 @@ int main(int argc, char** argv) {
                     matchvar += "-" + varname + " + " + assignments[u][i] + " + " + assignments[v][j] + " <= 1" + "\n";
                     variable_matching += matchvar;
                     counter++;
-                    distance = 0;
-                    demand = 0;
+                    int distance = 0;
+                    int demand = 0;
                     distance = distances[u][v];
                     demand = traffic[u][v];
-                    total = 0;
+                    int total = 0;
                     if (demand > -1 && distance > -1) {
                         total = distance * demand;
                     }
@@ -98,14 +93,14 @@ int main(int argc, char** argv) {
         int capacity = pm_caps[u];
         string constraint;
         for (int i = 0; i < vm_size; i++) {
-            load = vm_loads[i];
+            int load = vm_loads[i];
             string newterm = to_string(load) + " " + assignments[u][i];
             if (i > 0) {
                 newterm = " + " + newterm;
             }
             constraint += newterm;
         }
-        constraint "c" + to_string(counter) + ": " + constraint;
+        constraint = "c" + to_string(counter) + ": " + constraint;
         capacity_constraint += constraint + " <= " + to_string(capacity) + "\n";
         counter++;
     }
