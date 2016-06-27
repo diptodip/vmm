@@ -9,14 +9,14 @@ def generate_lp_linear(vmm, filename):
     assignment_guarantee = ""
     variable_matching = ""
     capacity_constraint = ""
-    objvars = np.ndarray(shape=(vmm.physical_size, vmm.virtual_size, vmm.physical_size, vmm.virtual_size), dtype=object)
+    #objvars = np.ndarray(shape=(vmm.physical_size, vmm.virtual_size, vmm.physical_size, vmm.virtual_size), dtype=object)
     assignments = np.ndarray(shape=(vmm.physical_size, vmm.virtual_size), dtype=object)
 
     for u in range(vmm.physical_size):
         for i in range(vmm.virtual_size):
             varname = "a_" + str(u) + "_" + str(i)
             assignments[u, i] = varname
-            bounds += "0 <= " + str(assignments[u, i]) + " <= 1\n"
+            bounds += "0 <= " + varname + " <= 1\n"
 
     print("[out] generating objective function")
     objcounter = 0
@@ -24,10 +24,10 @@ def generate_lp_linear(vmm, filename):
     for u, v in itertools.product(range(vmm.physical_size), repeat=2):
         for i, j in itertools.product(range(vmm.virtual_size), repeat=2):
             varname = "a_" + str(u) + "_" + str(i) + "_" + str(v) + "_" + str(j)
-            objvars[u, i, v, j] = varname
-            bounds += "0 <= " + str(objvars[u, i, v, j]) + " <= 1\n"
+            #objvars[u, i, v, j] = varname
+            bounds += "0 <= " + varname + " <= 1\n"
             matchvar = "c" + str(counter) + ": "
-            matchvar += "-" + objvars[u, i, v, j] + " + " + assignments[u, i] + " + " + assignments[v, j] + " <= 1" + "\n"
+            matchvar += "-" + varname + " + " + assignments[u, i] + " + " + assignments[v, j] + " <= 1" + "\n"
             variable_matching += matchvar
             counter += 1
             distance = 0
@@ -44,7 +44,6 @@ def generate_lp_linear(vmm, filename):
 
     print("[out] generating constraints")
 
-    counter = 0
     for u in range(vmm.physical_size):
         capacity = vmm.pm_list[u].capacity
         constraint = ""
