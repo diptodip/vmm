@@ -7,3 +7,55 @@ Iteration:     1    Scaled infeas =             5.793305
 
 Dual simplex solved model.
 
+
+Log for 'generator.lp' Clone_2 (V12.6.3.0) Fri Jun 24 11:16:55 2016
+
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =            24.697378
+Iteration:    53    Scaled infeas =            14.832754
+
+Dual simplex solved model.
+
+
+Log for 'generator.lp' Clone_2 (V12.6.3.0) Fri Jun 24 11:30:52 2016
+
+
+Iteration log . . .
+Iteration:     1    Scaled infeas =            45.626953
+Iteration:   473    Scaled infeas =            35.909111
+Iteration:   928    Scaled infeas =            35.884055
+Elapsed time = 64.10 sec. (12951.58 ticks, 928 iterations)
+Iteration:  1343    Scaled infeas =            34.067383
+Iteration:  1764    Scaled infeas =            34.067383
+Iteration:  2175    Scaled infeas =            34.067383
+Elapsed time = 121.21 sec. (26513.99 ticks, 2175 iterations)
+Iteration:  2575    Scaled infeas =            34.067383
+Iteration:  2971    Scaled infeas =            34.067383
+Iteration:  3361    Scaled infeas =            34.067383
+Elapsed time = 183.53 sec. (40731.54 ticks, 3361 iterations)
+Iteration:  3746    Scaled infeas =            34.067383
+Iteration:  4127    Scaled infeas =            34.067383
+Iteration:  4502    Scaled infeas =            34.067383
+Elapsed time = 245.42 sec. (54862.83 ticks, 4502 iterations)
+Iteration:  4857    Scaled infeas =            34.067383
+Iteration:  5202    Scaled infeas =            34.067383
+Iteration:  5532    Scaled infeas =            34.067383
+Elapsed time = 305.32 sec. (68708.04 ticks, 5532 iterations)
+Iteration:  5857    Scaled infeas =            34.067383
+Iteration:  6177    Scaled infeas =            34.067383
+Iteration:  6482    Scaled infeas =            34.067383
+Elapsed time = 364.36 sec. (82398.24 ticks, 6482 iterations)
+Iteration:  6777    Scaled infeas =            34.067383
+Iteration:  7062    Scaled infeas =            34.067383
+Iteration:  7347    Scaled infeas =            34.067383
+Elapsed time = 422.08 sec. (95865.46 ticks, 7347 iterations)
+Iteration:  7617    Scaled infeas =            34.067383
+Iteration:  7882    Scaled infeas =            34.067383
+Iteration:  8137    Scaled infeas =            34.067383
+Elapsed time = 477.50 sec. (109160.73 ticks, 8137 iterations)
+Iteration:  8382    Scaled infeas =            34.067383
+Elapsed time = 547.49 sec. (119297.93 ticks, 8406 iterations)
+
+Dual simplex solved model.
+

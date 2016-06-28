@@ -8,3 +8,37 @@ Barrier time = 0.04 sec. (6.54 ticks)
 
 Dual simplex solved model.
 
+
+Log for 'generator.lp' Clone_1 (V12.6.3.0) Fri Jun 24 11:16:55 2016
+
+Tried aggregator 0 times.
+No LP presolve or aggregator reductions.
+Presolve time = 0.64 sec. (131.03 ticks)
+Symmetry aggregator did 365868 additional substitutions.
+Presolve time = 0.10 sec. (26.79 ticks)
+Barrier time = 0.10 sec. (26.79 ticks)
+Barrier time = 3.16 sec. (308.37 ticks)
+
+Dual simplex solved model.
+
+
+Log for 'generator.lp' Clone_1 (V12.6.3.0) Fri Jun 24 11:30:52 2016
+
+Tried aggregator 0 times.
+No LP presolve or aggregator reductions.
+Presolve time = 28.18 sec. (5054.46 ticks)
+Symmetry aggregator did 14102786 additional substitutions.
+Tried aggregator 0 times.
+No LP presolve or aggregator reductions.
+Presolve time = 15.34 sec. (2528.19 ticks)
+Parallel mode: using up to 30 threads for barrier.
+
+***NOTE: Found 4999 dense columns.
+
+Number of nonzeros in lower triangle of A*A' = 552826
+Total time for automatic ordering = 1.19 sec. (298.90 ticks)
+Barrier time = 339.87 sec. (126779.03 ticks)
+Barrier time = 534.70 sec. (137714.13 ticks)
+
+Dual simplex solved model.
+

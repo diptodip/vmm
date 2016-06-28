@@ -1,22 +1,26 @@
 #include<iostream>
 #include<fstream>
 #include<string>
+#include<vector>
 
 int main(int argc, char** argv) {
     // reading .vmm file
     using namespace std;
     cout << "[out] reading .vmm file" << endl;
-    ifstream in(argv[0]);
+    string filein = argv[1];
+    string fileout = argv[2];
+    cout << filein << endl;
+    ifstream in(filein);
     string strin;
     getline(in, strin);
-    int pm_size = stoi(strin);
+    const int pm_size = stoi(strin);
     int pm_caps[pm_size];
     for (int i = 0; i < pm_size; i++) {
         getline(in, strin);
         pm_caps[i] = stoi(strin);
     }
     getline(in, strin);
-    int vm_size = stoi(strin);
+    const int vm_size = stoi(strin);
     int vm_loads[vm_size];
     for (int i = 0; i < vm_size; i++) {
         getline(in, strin);
@@ -38,49 +42,57 @@ int main(int argc, char** argv) {
     }
     in.close();
 
-    string assignments[pm_size][vm_size];
-    string bounds;
-    string variable_matching;
-    string assignment_guarantee;
-    string capacity_constraint;
-    string obj;
+    const int bothsquared = pm_size * pm_size * vm_size * vm_size;
+    const int sum = bothsquared + (pm_size * vm_size);
+
+    vector<string> assign_layer(vm_size);
+    vector<vector<string> > assignments(pm_size, assign_layer);
+    vector<string> bounds(sum);
+    vector<string> variable_matching(bothsquared);
+    vector<string> assignment_guarantee(vm_size);
+    vector<string> capacity_constraint(pm_size);
+    vector<string> obj(bothsquared);
 
     cout << "[out] writing objective and generating variable matching constraints and variable bounds" << endl;
 
+    int acounter = 0;
+    int bounds_counter = 0;
     for(int u = 0; u < pm_size; u++) {
         for (int i = 0; i < vm_size; i++) {
-            string varname = "a_" + to_string(u) + "_" + to_string(i);
+            string varname = "a_" + to_string(acounter);
             assignments[u][i] = varname;
-            bounds += "0 <= " + varname + " <= 1\n";
+            acounter++;
+            bounds[bounds_counter] = varname;
+            bounds_counter++;
         }
     }
     
     int objcounter = 0;
     int counter = 0;
+    int vmatch_counter = 0;
+
+    cout << "[out] entering quadruple nested loop" << endl;
 
     for (int u = 0; u < pm_size; u++) {
         for (int v = 0; v < pm_size; v++) {
             for (int i = 0; i < pm_size; i++) {
                 for (int j = 0; j < vm_size; j++) {
-                    string varname = "a_" + to_string(u) + "_" + to_string(i) + "_" + to_string(v) + "_" + to_string(j);
-                    bounds += "0 <= " + varname + " <= 1\n";
-                    string matchvar = "c" + to_string(counter) + ": ";
-                    matchvar += "-" + varname + " + " + assignments[u][i] + " + " + assignments[v][j] + " <= 1" + "\n";
-                    variable_matching += matchvar;
+                    string varname = "obj_" + to_string(objcounter);
+                    bounds[bounds_counter] = varname;
+                    bounds_counter++;
+                    string matchvar;
+                    matchvar = "-" + varname + " + " + assignments[u][i] + " + " + assignments[v][j];
+                    variable_matching[vmatch_counter] = matchvar;
+                    vmatch_counter++;
                     counter++;
-                    int distance = 0;
-                    int demand = 0;
-                    distance = distances[u][v];
-                    demand = traffic[u][v];
+                    int distance = distances[u][v];
+                    int demand = traffic[u][v];
                     int total = 0;
                     if (demand > -1 && distance > -1) {
                         total = distance * demand;
                     }
                     string objterm = to_string(total) + " " + varname;
-                    if (objcounter > 0) {
-                        objterm = " + " + objterm;
-                    }
-                    obj += objterm;
+                    obj[objcounter] = objterm;
                     objcounter++;
                 }
             }
@@ -88,6 +100,8 @@ int main(int argc, char** argv) {
     }
 
     cout << "[out] generating remaining constraints" << endl;
+
+    int cap_counter = 0;
 
     for (int u = 0; u < pm_size; u++) {
         int capacity = pm_caps[u];
@@ -100,10 +114,12 @@ int main(int argc, char** argv) {
             }
             constraint += newterm;
         }
-        constraint = "c" + to_string(counter) + ": " + constraint;
-        capacity_constraint += constraint + " <= " + to_string(capacity) + "\n";
+        capacity_constraint[cap_counter] = constraint + " <= " + to_string(capacity);
+        cap_counter++;
         counter++;
     }
+
+    int guarantee_counter = 0;
 
     for (int i = 0; i < vm_size; i++) {
         string constraint;
@@ -114,23 +130,39 @@ int main(int argc, char** argv) {
             }
             constraint += newterm;
         }
-        constraint = "c" + to_string(counter) + ": " + constraint;
-        assignment_guarantee += constraint + " = 1\n";
+        assignment_guarantee[guarantee_counter] = constraint;
+        guarantee_counter++;
         counter++;
     }
 
     cout << "[out] printing .lp file";
 
-    ofstream out(argv[1]);
+    ofstream out(fileout);
 
     out << "Minimize" << endl;
-    out << "obj: " << obj << endl;
+    out << "obj: " << obj[0];
+    for (int i = 1; i < sizeof(obj)/sizeof(obj[0]); i++) {
+        out << " + " << obj[i];
+    }
+    out << endl;
+    counter = 0;
     out << "Subject To" << endl;
-    out << capacity_constraint;
-    out << assignment_guarantee;
-    out << variable_matching;
+    for (int i = 0; i < capacity_constraint.size(); i++) {
+        out << "c" << counter << ": " << capacity_constraint[0] << endl;
+        counter++;
+    }
+    for (int i = 0; i < assignment_guarantee.size(); i++) {
+        out << "c" << counter << ": " << assignment_guarantee[0] << " = 1" << endl;
+        counter++;
+    }
+    for (int i = 0; i < variable_matching.size(); i++) {
+        out << "c" << counter << ": " << variable_matching[0] << " <= 1" << endl;
+        counter++;
+    }
     out << "Bounds" << endl;
-    out << bounds;
+    for (int i = 0; i < bounds.size(); i++) {
+        out << "0 <= " << bounds[0] << " <= 1" << endl;
+    }
     out << "End" << endl;
     out.close();
 }
