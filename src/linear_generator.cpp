@@ -9,7 +9,6 @@ int main(int argc, char** argv) {
     cout << "[out] reading .vmm file" << endl;
     string filein = argv[1];
     string fileout = argv[2];
-    cout << filein << endl;
     ifstream in(filein);
     string strin;
     getline(in, strin);
@@ -193,6 +192,7 @@ int main(int argc, char** argv) {
             }
         }
     }
+    cout << "[out] writing match constraints" << endl;
     out << endl;
     out << "Subject To" << endl;
     int match_counter = 0;
@@ -208,6 +208,7 @@ int main(int argc, char** argv) {
             }
         }
     }
+    cout << "[out] writing remaining constraints" << endl;
     int capacity_counter = 0;
     for (int u = 0; u < pm_size; u++) {
         capacity_counter = 0;
@@ -238,6 +239,7 @@ int main(int argc, char** argv) {
         out << " = 1" << endl;
         counter++;
     }
+    cout << "[out] writing bounds" << endl;
     out << "Bounds" << endl;
     int bound_counter = 0;
     for (int u = 0; u < pm_size; u++) {
@@ -257,4 +259,5 @@ int main(int argc, char** argv) {
     }
     out << "End" << endl;
     out.close();
+    cout << "[out] done writing" << endl;
 }
