@@ -8,8 +8,8 @@ public class Generator {
     public static void main(String[] args) throws Exception {
         // reading .vmm file
         System.out.println("[in] reading .vmm file");
-        String filein = args[1];
-        String fileout = args[2];
+        String filein = args[0];
+        String fileout = args[1];
         BufferedReader in = new BufferedReader(new FileReader(filein));
         int pm_size = Integer.parseInt(in.readLine());
         int[] pm_caps = new int[pm_size];
