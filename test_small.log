@@ -1,0 +1,22 @@
+Parallel mode: deterministic, using up to 32 threads for concurrent optimization.
+Tried aggregator 1 time.
+LP Presolve eliminated 275098 rows and 275098 columns.
+Reduced LP has 364962 rows, 365702 columns, and 1096306 nonzeros.
+Presolve time = 1.12 sec. (356.95 ticks)
+Initializing dual steep norms . . .
+
+Iteration log . . .
+Iteration:     1   Dual objective     =             0.000000
+Perturbation started.
+Iteration:   101   Dual objective     =             0.000000
+Removing perturbation.
+Reinitializing dual norms . . .
+
+Dual simplex solved model.
+
+[out] CPLEX value: 0
+[out] CPLEX done
+
+real	0m13.684s
+user	0m19.583s
+sys	0m1.266s

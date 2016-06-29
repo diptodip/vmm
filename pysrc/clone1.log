@@ -42,3 +42,53 @@ Barrier time = 534.70 sec. (137714.13 ticks)
 
 Dual simplex solved model.
 
+
+Log for 'test_small.lp' Clone_1 (V12.6.3.0) Tue Jun 28 13:52:16 2016
+
+Tried aggregator 0 times.
+No LP presolve or aggregator reductions.
+Presolve time = 0.63 sec. (133.15 ticks)
+Symmetry aggregator did 364902 additional substitutions.
+Presolve time = 0.10 sec. (26.56 ticks)
+Barrier time = 0.10 sec. (26.56 ticks)
+Barrier time = 3.15 sec. (308.25 ticks)
+
+Dual simplex solved model.
+
+
+Log for 'test_big.lp' Clone_1 (V12.6.3.0) Tue Jun 28 23:16:40 2016
+
+Presolve has eliminated 0 rows and 0 columns...
+Presolve has eliminated 0 rows and 0 columns...
+Tried aggregator 0 times.
+No LP presolve or aggregator reductions.
+Presolve time = 312.82 sec. (41680.49 ticks)
+Elapsed time for symmetry detection = 723.25 sec. (10000.00 ticks)
+Elapsed time for symmetry detection = 1034.06 sec. (20212.15 ticks)
+Elapsed time for symmetry detection = 1361.53 sec. (30295.31 ticks)
+Elapsed time for symmetry detection = 1696.80 sec. (40516.48 ticks)
+
+Log for 'test_big.lp' Clone_1 (V12.6.3.0) Wed Jun 29 11:19:54 2016
+
+Presolve has eliminated 0 rows and 0 columns...
+Presolve has eliminated 0 rows and 0 columns...
+Tried aggregator 0 times.
+No LP presolve or aggregator reductions.
+Presolve time = 480.09 sec. (41680.49 ticks)
+Elapsed time for symmetry detection = 673.54 sec. (10000.00 ticks)
+Elapsed time for symmetry detection = 1169.77 sec. (20212.15 ticks)
+Elapsed time for symmetry detection = 1497.03 sec. (30295.31 ticks)
+Elapsed time for symmetry detection = 1835.65 sec. (40516.48 ticks)
+
+Log for 'test_small.lp' Clone_1 (V12.6.3.0) Wed Jun 29 16:11:14 2016
+
+Tried aggregator 0 times.
+No LP presolve or aggregator reductions.
+Presolve time = 0.67 sec. (133.32 ticks)
+Symmetry aggregator did 364902 additional substitutions.
+Presolve time = 0.10 sec. (26.65 ticks)
+Barrier time = 0.10 sec. (26.65 ticks)
+Barrier time = 3.23 sec. (308.69 ticks)
+
+Dual simplex solved model.
+

@@ -57,10 +57,10 @@ int main(int argc, char** argv) {
     int acounter = 0;
     for(int u = 0; u < pm_size; u++) {
         for (int i = 0; i < vm_size; i++) {
-            string varname += "a_" + to_string(acounter);
+            string varname = "a_" + to_string(acounter);
             assignments[u][i] = varname;
             acounter++;
-            bounds += "0 <=" + varname + " <= 1\n";
+            bounds += "0 <= " + varname + " <= 1\n";
         }
     }
     
@@ -72,16 +72,16 @@ int main(int argc, char** argv) {
 
     for (int u = 0; u < pm_size; u++) {
         for (int v = 0; v < pm_size; v++) {
-            for (int i = 0; i < pm_size; i++) {
+            for (int i = 0; i < vm_size; i++) {
                 for (int j = 0; j < vm_size; j++) {
-                    string varname = "obj_" + to_string(objcounter);
-                    bounds += "0 <= " + varname " <= 1\n";
-                    variable_matching += "c" + counter + ": " + "-" + varname + " + " + assignments[u][i] + " + " + assignments[v][j] + " <= 1\n";
+                    string varname = "o_" + to_string(objcounter);
+                    bounds += "0 <= " + varname + " <= 1\n";
+                    variable_matching += "c" + to_string(counter) + ": -" + varname + " + " + assignments[u][i] + " + " + assignments[v][j] + " <= 1\n";
                     counter++;
                     int distance = distances[u][v];
-                    int demand = traffic[u][v];
+                    int demand = traffic[i][j];
                     int total = 0;
-                    if (demand > -1 && distance > -1) {
+                    if ((demand > 0) && (distance > 0)) {
                         total = distance * demand;
                         if (objterm == 0) {
                             obj += to_string(total) + " " + varname;
@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    cout << "[out] generating remaining constraints" << endl;
+    cout << "[info] generating remaining constraints" << endl;
 
     for (int u = 0; u < pm_size; u++) {
         int capacity = pm_caps[u];

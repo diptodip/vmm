@@ -1,0 +1,43 @@
+Found incumbent of value 19096.000000 after 0.00 sec. (0.00 ticks)
+Tried aggregator 1 time.
+MIP Presolve eliminated 1 rows and 0 columns.
+MIP Presolve added 108 rows and 54 columns.
+MIP Presolve modified 19 coefficients.
+Reduced MIP has 116 rows, 72 columns, and 246 nonzeros.
+Reduced MIP has 72 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.00 sec. (0.04 ticks)
+Probing time = 0.00 sec. (0.03 ticks)
+Tried aggregator 1 time.
+MIP Presolve eliminated 54 rows and 0 columns.
+Reduced MIP has 62 rows, 72 columns, and 192 nonzeros.
+Reduced MIP has 72 binaries, 0 generals, 0 SOSs, and 0 indicators.
+Presolve time = 0.00 sec. (0.13 ticks)
+Probing time = 0.00 sec. (0.03 ticks)
+Clique table members: 6.
+MIP emphasis: balance optimality and feasibility.
+MIP search method: dynamic search.
+Parallel mode: deterministic, using up to 32 threads.
+Root relaxation solution time = 0.00 sec. (0.06 ticks)
+
+        Nodes                                         Cuts/
+   Node  Left     Objective  IInf  Best Integer    Best Bound    ItCnt     Gap
+
+*     0+    0                        19096.0000        0.0000           100.00%
+*     0+    0                         7344.0000        0.0000           100.00%
+*     0     0      integral     0        0.0000        0.0000        0    0.00%
+Elapsed time = 0.01 sec. (0.42 ticks, tree = 0.00 MB, solutions = 3)
+
+Root node processing (before b&c):
+  Real time             =    0.01 sec. (0.42 ticks)
+Parallel b&c, 32 threads:
+  Real time             =    0.00 sec. (0.00 ticks)
+  Sync time (average)   =    0.00 sec.
+  Wait time (average)   =    0.00 sec.
+                          ------------
+Total (root+branch&cut) =    0.01 sec. (0.42 ticks)
+[out] CPLEX value: 0
+[out] CPLEX done
+
+real	0m0.043s
+user	0m0.027s
+sys	0m0.036s
