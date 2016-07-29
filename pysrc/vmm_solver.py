@@ -1,5 +1,5 @@
 #import cvxopt
-import cplex
+#import cplex
 from vmm import *
 import itertools
 import numpy as np
@@ -443,7 +443,7 @@ def linear_program(vmm):
     print("[out] constraints complete")
     write_cplex(c, "test.lp")
     print("DONE WRITING")
-    
+
     # solve the LP
     c.solve()
     sol = c.solution
@@ -489,77 +489,349 @@ def random_mapping(vmm):
     return x
 
 def random_iteration(vmm, k):
-    cost = cplex.infinity
+    cost = 1e40
     x = {}
-    for i in range(k):
-        current = random_mapping(vmm)
-        current_cost = calc_cost(current, vmm)
-        if current_cost >= 0 and current_cost < cost:
-            cost = current_cost
-            x = current
+    while not cost < 1e40:
+        print("[info] starting batch")
+        for i in range(k):
+            current = random_mapping(vmm)
+            current_cost = calc_cost(current, vmm)
+            if current_cost == 0:
+                cost = current_cost
+                x = current
+                break
+            if current_cost >= 0 and current_cost < cost:
+                cost = current_cost
+                x = current
     print("[out] RI solution: \n{}".format(x))
     print("[out] RI cost: {}".format(cost))
     print("[out] RI done")
     return x
 
 def likelihood(current_cost, new_cost, T):
-    if new_cost > 0 and new_cost < current_cost:
+    if new_cost >= 0 and new_cost < current_cost:
         return 1
     else:
-        return math.exp((current_cost - abs(new_cost))/T)
+        return math.exp((abs(current_cost) - abs(new_cost))/T)
+
+def swap(vmm, current, k):
+    new = {}
+    keys = current.keys()
+    for key in keys:
+        new[key] = current[key]
+    for i in range(k):
+        no_step = keys[i]
+        if i + 1 < vmm.virtual_size:
+            one_step = keys[i + 1]
+            new[no_step] = current[one_step]
+        else:
+            first = keys[0]
+            new[no_step] = current[first]
+    return new
 
 def simulated_annealing(vmm, T, decay):
-    cost = cplex.infinity
+    cost = 1e40
     vms = vmm.vm_list
     x = random_mapping(vmm)
     current = x
     current_cost = calc_cost(current, vmm)
     while T > 1:
-        vm1, vm2, vm3 = rng.sample(vms, 3)
-        new = current
-        new[vm1] = current[vm3]
-        new[vm2] = current[vm1]
-        new[vm3] = current[vm2]
+        new = swap(vmm, current, rng.randint(2, vmm.virtual_size))
         new_cost = calc_cost(new, vmm)
-        if likelihood(current_cost, new_cost, T) > rng.random():
+        if likelihood(current_cost, new_cost, T) >= rng.random():
             current = new
             current_cost = new_cost
-        if current_cost > 0 and current_cost < cost:
+        if current_cost >= 0 and current_cost < cost:
             cost = current_cost
             x = current
+            if cost == 0:
+                break
         T *= 1 - decay
     print("[out] SA solution: \n{}".format(x))
     print("[out] SA cost: {}".format(calc_cost(x, vmm)))
     print("[out] SA done")
     return x
 
+def impact(vm, pm, remaining, vmm):
+    impact = 0
+    for neighbor in vm.neighbors:
+        if vmm.traffic.has_key((vm, neighbor)) and vmm.distances.has_key((pm, vmm.initial[neighbor])):
+            impact += vmm.traffic[(vm, neighbor)] * vmm.distances[(pm, vmm.initial[neighbor])]
+    impact /= (max(vmm.distances.values()) * max(vmm.traffic.values()))
+    topology = 0
+    for pm_l in vmm.pm_list:
+        if vmm.distances.has_key((pm, pm_l)):
+            topology += vmm.distances[(pm, pm_l)] * (pm_l.capacity - remaining[pm_l])
+    topology /= (vmm.physical_size * max(vmm.distances.values()))
+    impact += topology
+    return impact
+
+def appaware(vmm):
+    vm_list = vmm.vm_list
+    pm_list = vmm.pm_list
+    total_weight = {}
+    remaining = {}
+    x = {}
+    sorted_vm_list = []
+
+    for pm in pm_list:
+        remaining[pm] = pm.capacity
+
+    for vm in vm_list:
+        total = 0
+        for neighbor in vm.neighbors:
+            total += vmm.traffic[(vm, neighbor)]
+        total_weight[vm] = total
+
+    sorted_vm_list = sorted(total_weight, key=total_weight.get)
+    for vm in sorted_vm_list:
+        min_impact = 100000000
+        min_pm = PM(-1, -1)
+        for pm in pm_list:
+            if vm.load < remaining[pm]:
+                curr_impact = 0
+                curr_impact = impact(vm, pm, remaining, vmm)
+                if curr_impact < min_impact:
+                    min_impact = curr_impact
+                    min_pm = pm
+        if min_pm.number > -1:
+            x[vm] = min_pm
+            remaining[min_pm] -= vm.load
+            
+    # guarantee a solution is found
+    for vm in sorted_vm_list:
+        if not x.has_key(vm):
+            pm = rng.choice(pm_list)
+            while remaining[pm] >= vm.load:
+                x[vm] = pm
+                remaining[pm] -= vm.load
+
+    cost = calc_cost(x, vmm)
+    print("[out] AA solution:")
+    print(x)
+    print("[out] AA cost: {}".format(cost))
+    print("[out] AA done")
+    return x
+
+def greedy_unfold(vmm, initial_machine):
+    # initialize variables
+    vm_list = vmm.vm_list
+    pm_list = vmm.pm_list
+    total_weight = {}
+    total_distance = {}
+    remaining = {}
+    sorted_vm_list = []
+    x = {}
+    
+    for vm in vm_list:
+        x[vm] = initial_machine
+        total = 0
+        for neighbor in vm.neighbors:
+            total += vmm.traffic[(vm, neighbor)]
+        total_weight[vm] = total
+
+    for pm in pm_list:
+        remaining[pm] = pm.capacity
+
+    sorted_vm_list = sorted(total_weight, key=total_weight.get)
+
+    for vm in sorted_vm_list:
+        min_distance = 1e40
+        min_neighbor = x[vm]
+        for neighbor in x[vm].neighbors:
+            if remaining[neighbor] >= vm.load and vmm.distances[(x[vm], neighbor)] < min_distance:
+                min_neighbor = neighbor
+                min_distance = vmm.distances[(x[vm], neighbor)]
+        remaining[x[vm]] += vm.load
+        x[vm] = min_neighbor
+        remaining[min_neighbor] -= vm.load
+
+    """
+    cost = calc_cost(x, vmm)
+    print("[out] UF solution:")
+    print(x)
+    print("[out] UF cost: {}".format(cost))
+    print("[out] UF done")
+    """
+    return x
+
+def iterative_unfolding(vmm):
+    cost = 1e40
+    x = {}
+    for pm in vmm.pm_list:
+        current = greedy_unfold(vmm, pm)
+        current_cost = calc_cost(current, vmm)
+        if current_cost >= 0 and current_cost < cost:
+            cost = current_cost
+            x = current
+    print("[out] IUF solution:")
+    print(x)
+    print("[out] IUF cost: {}".format(cost))
+    print("[out] IUF done")
+    return x
+
+def pairwise_unfolding(vmm):
+    # initialize variables
+    vm_list = vmm.vm_list
+    pm_list = vmm.pm_list
+    initial_machine = rng.choice(pm_list)
+    total_weight = {}
+    total_distance = {}
+    remaining = {}
+    sorted_vm_list = []
+    x = {}
+    for vm in vm_list:
+        x[vm] = initial_machine
+        total = 0
+        for neighbor in vm.neighbors:
+            total += vmm.traffic[(vm, neighbor)]
+        total_weight[vm] = total
+    for pm in pm_list:
+        remaining[pm] = pm.capacity
+    sorted_vm_list = sorted(total_weight, key=total_weight.get)
+
+    # iterate through pairs of VMs
+    for i, j in itertools.product(range(vmm.virtual_size), repeat=2):
+        vm_i = sorted_vm_list[i]
+        vm_j = sorted_vm_list[j]
+        min_i = x[vm_i]
+        min_j = x[vm_j]
+        min_cost = 1e40
+        for u, v in itertools.product(range(vmm.physical_size), repeat=2):
+            pm_u = pm_list[u]
+            pm_v = pm_list[v]
+            if remaining[pm_u] > vm_i.load and remaining[pm_v] > vm_j.load:
+                cost = 0
+                distance = 0
+                traffic = 0
+                if vmm.distances.has_key((pm_u, pm_v)):
+                    distance = vmm.distances[(pm_u, pm_v)]
+                if vmm.traffic.has_key((vm_i, vm_j)):
+                    traffic = vmm.traffic[(vm_i, vm_j)]
+                cost = distance * traffic
+                if cost < min_cost:
+                    min_cost = cost
+                    min_i = pm_u
+                    min_j = pm_v
+        remaining[x[vm_i]] += vm_i.load
+        remaining[x[vm_j]] += vm_j.load
+        x[vm_i] = min_i
+        x[vm_j] = min_j
+        remaining[x[vm_i]] -= vm_i.load
+        remaining[x[vm_j]] -= vm_j.load
+
+    cost = calc_cost(x, vmm)
+    print("[out] PUF solution:")
+    print(x)
+    print("[out] PUF cost: {}".format(cost))
+    print("[out] PUF done")
+    return x
+
+def dependency_cost(vm, pm, x, vmm):
+    cost = 0
+    for neighbor in vm.neighbors:
+        cost += vmm.traffic[(vm, neighbor)] * vmm.distances[(pm, x[neighbor])]
+    return cost
+
+def shuffle(vmm, k):
+    # initialize variables
+    vm_list = vmm.vm_list
+    pm_list = vmm.pm_list
+    total_weight = {}
+    remaining = {}
+    x = {}
+    sorted_vm_list = []
+
+    for pm in pm_list:
+        remaining[pm] = pm.capacity
+
+    for vm in vm_list:
+        total = 0
+        for neighbor in vm.neighbors:
+            total += vmm.traffic[(vm, neighbor)]
+        total_weight[vm] = total
+
+    sorted_vm_list = sorted(total_weight, key=total_weight.get)
+
+    # run appaware
+    for vm in sorted_vm_list:
+        min_impact = 100000000
+        min_pm = PM(-1, -1)
+        for pm in pm_list:
+            if vm.load < remaining[pm]:
+                curr_impact = 0
+                curr_impact = impact(vm, pm, remaining, vmm)
+                if curr_impact < min_impact:
+                    min_impact = curr_impact
+                    min_pm = pm
+        if min_pm.number > -1:
+            x[vm] = min_pm
+            remaining[min_pm] -= vm.load
+
+    # guarantee a solution is found
+    for vm in sorted_vm_list:
+        if not x.has_key(vm):
+            pm = rng.choice(pm_list)
+            while remaining[pm] >= vm.load:
+                x[vm] = pm
+                remaining[pm] -= vm.load
+    
+    # while compute time available, shuffle solution
+    min_cost = calc_cost(x, vmm)
+    for i in range(k):
+        vm = rng.choice(sorted_vm_list)
+        pm = rng.choice(pm_list)
+        old_pm = x[vm]
+        old_contribution = 0
+        new_contribution = 0
+        for neighbor in vm.neighbors:
+            old_contribution += vmm.traffic[(vm, neighbor)] * vmm.distances[x[vm], x[neighbor]]
+            new_contribution += vmm.traffic[(vm, neighbor)] * vmm.distances[pm, x[neighbor]]
+        x[vm] = pm
+        difference = new_contribution - old_contribution
+        if remaining[pm] > vm.load and difference < 0:
+            remaining[old_pm] += vm.load
+            remaining[pm] -= vm.load
+        else:
+            x[vm] = old_pm
+    
+    cost = calc_cost(x, vmm)
+    print("[out] SHAA solution:")
+    print(x)
+    print("[out] SHAA cost: {}".format(cost))
+    print("[out] SHAA done")
+    return x
+
 def main():
-    a = VMM(4, 9)
+    a = VMM(100, 200)
     a.generate()
 
     #bf_time = time.time()
     #brute_force(a)
     #print("-----%s seconds-----" % (time.time() - bf_time))
 
-    iqp_time = time.time()
-    quadratic_integer_program(a)
-    print("-----%s seconds-----" % (time.time() - iqp_time))
-    
-    ilp_time = time.time()
-    integer_program(a)
-    print("-----%s seconds-----" % (time.time() - ilp_time))
+    #iqp_time = time.time()
+    #quadratic_integer_program(a)
+    #print("-----%s seconds-----" % (time.time() - iqp_time))
+
+    #ilp_time = time.time()
+    #integer_program(a)
+    #print("-----%s seconds-----" % (time.time() - ilp_time))
 
     #qp_time = time.time()
     #quadratic_program(a)
     #print("-----%s seconds-----" % (time.time() - qp_time))
-    
-    lp_time = time.time()
-    linear_program(a)
-    print("-----%s seconds-----" % (time.time() - lp_time))
+
+    #lp_time = time.time()
+    #linear_program(a)
+    #print("-----%s seconds-----" % (time.time() - lp_time))
+
+    aa_time = time.time()
+    appaware(a)
+    print("-----%s seconds-----" % (time.time() - aa_time))
 
     ri_time = time.time()
-    random_iteration(a, 10000)
+    shuffle(a, a.virtual_size * a.physical_size)
     print("-----%s seconds-----" % (time.time() - ri_time))
-
 
 if __name__ == "__main__": main()
