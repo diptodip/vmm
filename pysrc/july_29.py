@@ -11,8 +11,8 @@ variable = []
 aa_response = []
 sh_response = []
 
-for i in range(5):
-    size = rng.randint(25, 50)
+for i in range(100):
+    size = rng.randint(25, 75)
     a = VMM(size, 2*size)
     a.generate()
     try:
