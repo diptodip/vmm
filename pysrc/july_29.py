@@ -11,8 +11,8 @@ variable = []
 aa_response = []
 sh_response = []
 
-for i in range(10):
-    size = rng.randint(100, 500)
+for i in range(5):
+    size = rng.randint(25, 50)
     a = VMM(size, 2*size)
     a.generate()
     try:
@@ -20,6 +20,8 @@ for i in range(10):
         sh = shuffle(a, size*2*size)
         sh_cost = calc_cost(sh, a)
         aa_cost = calc_cost(aa, a)
+        print(sh_cost)
+        print(aa_cost)
         variable.append(size)
         sh_response.append(sh_cost)
         aa_response.append(aa_cost)
