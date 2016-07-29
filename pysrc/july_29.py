@@ -11,7 +11,7 @@ variable = []
 aa_response = []
 sh_response = []
 
-for i in range(500):
+for i in range(10):
     size = rng.randint(100, 500)
     a = VMM(size, 2*size)
     a.generate()
@@ -40,7 +40,7 @@ plt.title("Cost of solutions vs. size of problem")
 plt.xlabel("size of problem")
 plt.ylabel("cost")
 aa_plot, = plt.plot(variable, aa_response, 'ro', label='AA')
-sh_plot, = plt.plot(variable, iu_response, 'bo', label='SH')
+sh_plot, = plt.plot(variable, sh_response, 'bo', label='SH')
 
 plt.legend(handles=[aa_plot, sh_plot])
 plt.savefig("july_29_fig1.png", format="png", dpi=300)
