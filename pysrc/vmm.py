@@ -40,6 +40,7 @@ class VMM(object):
         self.vm_list = []
         self.distances = {}
         self.traffic = {}
+        self.initial = {}
 
     def generate(self):
         # initialize physical machines
@@ -50,7 +51,7 @@ class VMM(object):
         for pm in self.physical_machines:
             pm.neighbors = set(rng.sample(self.physical_machines, rng.randint(1, self.physical_size)))
             pm.neighbors.discard(pm)
-            for neighbor in pm.neighbors:
+            for neighbor in self.pm_list:
                 if not (self.distances.has_key((pm, neighbor)) or self.distances.has_key((neighbor, pm))):
                     self.distances[(pm, neighbor)] = rng.randint(1, MAX_DISTANCE)
                     self.distances[(neighbor, pm)] = self.distances[(pm, neighbor)]
@@ -69,6 +70,19 @@ class VMM(object):
                     self.traffic[(vm, neighbor)] = rng.randint(1, MAX_TRAFFIC)
                     self.traffic[(neighbor, vm)] = self.traffic[(vm, neighbor)]
             self.traffic[(vm, vm)] = 0
+
+        # make random initial placement
+        counter = 0
+        remaining = {}
+        for pm in self.pm_list:
+            remaining[pm] = pm.capacity
+        for vm in self.vm_list:
+            pm = rng.choice(self.pm_list)
+            while vm.load > remaining[pm] and counter < 100 * self.physical_size:
+                pm = rng.choice(self.pm_list)
+                counter += 1
+            self.initial[vm] = pm
+            remaining[pm] -= vm.load
 
     def read(self, filename):
         with open(filename) as f:
